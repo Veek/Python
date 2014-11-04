@@ -12,7 +12,8 @@ py_hello(PyObject *self)
 }
 
 static PyMethodDef hellomethods[] = {
-    {'hello', py_hello, NULL, py_hello_doc}
+    {"hello", py_hello, METH_NOARGS, py_hello_doc},
+    {NULL},
 };
  
 static struct PyModuleDef hellomodule = {
@@ -24,7 +25,7 @@ static struct PyModuleDef hellomodule = {
 };
 
 PyMODINIT_FUNC
-PyInit_hello(void)
+PyInit__hello(void)
 {
     return PyModule_Create(&hellomodule);
 }
