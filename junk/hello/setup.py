@@ -4,6 +4,7 @@ setup(name="hello",
       py_modules = 'hello.py',
       ext_modules = [
         Extension("_hello",
-                  ["pyhello.c"])
+                  sources = ["pyhello.c", "hello.c"],
+                  depends = ["hello.h"])
     ]
 )

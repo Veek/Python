@@ -1,1 +1,1 @@
-int hello(void);
+int hello(int);
