@@ -17,16 +17,16 @@ static PyMethodDef hellomethods[] = {
  
 static struct PyModuleDef hellomodule = {
     PyModuleDef_HEAD_INIT,
-    "_hello",
+    "hello",
     NULL,
     -1,
-    _hellomethods
+    hellomethods
 };
 
 PyMODINIT_FUNC
-PyInit__hello(void)
+PyInit_hello(void)
 {
-    return PyModule_Create(&_hello);
+    return PyModule_Create(&hellomodule);
 }
 
 
