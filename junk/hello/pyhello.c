@@ -16,7 +16,11 @@ py_hello(PyObject *self, PyObject *args)
  * py_wrapper, 3rd field indicates tuple of args are being passed */
 static PyMethodDef hellomethods[] = {
     {"hello", py_hello, METH_NOARGS, py_hello_doc},
+<<<<<<< HEAD
     {NULL, NULL, 0, NULL}, /* Sentinel */
+=======
+    {NULL},
+>>>>>>> 6fc66807824281f810825dad33af9c41653598b0
 };
 
 /* 2nd field is ModuleName, 3'rd is doc string */
