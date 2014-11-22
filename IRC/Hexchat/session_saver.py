@@ -32,25 +32,33 @@ def join_channels(channels):
             hexchat.command('timer {} join {}'.format(delay, chan))
 
 
-def load_session():
-    '''Loads a saved session'''
-    tab_data = get_tab_data()
-#    debug(tab_data)
-    for network in tab_data.keys():
-        if not hexchat.get_context():
-            hexchat.command('server irc://"{}"/'.format(network))
-            join_channels(tab_data[network])
-        else:
-            hexchat.command('server irc://"{}"/'.format(network))
-            hexchat.find_context(server=network).set()
-            join_channels(tab_data[network])
-        hexchat.del_pluginpref('session_' + network)
+def connect_server(network):
+    # If the Tab is not a live server, then delay
+    hexchat.command('server irc://"{}"/'.format(network))
+
+
+def setup_channels():
+    # Get the Tab data, iterate the channel list for
+    network = hexchat.get_info('network')
+    hexchat.find_context(server=network).set()
+    join_channels(tab_data[network])
+    hexchat.del_pluginpref('session_' + network)
+
+
+def join_channels(word, word_eol, userdata):
+    # Ditch the hook and connect to channels for concerned server
+    hexchat.unhook(join_channels)
+    setup_channels()
+
 
 #-----------------------------------------------------------------------
 def save_session(userdata):
-    '''Saves the network|channels dictionary in pluginpref'''
+    # Saves the network|channels dictionary in pluginpref
     networks = {}
     channels = hexchat.get_list('channels')
+
+    if not hexchat.get_context():
+        return
 
     # Add all the servers
     for chan in channels:
@@ -69,12 +77,23 @@ def save_session(userdata):
     for network, channels in networks.items():
         if len(network):
             hexchat.set_pluginpref('session_' + network, ','.join(channels))
-#    debug(networks)
+#   debug(networks)
     return hexchat.EAT_ALL
 
-def connected():
-    time.sleep(1)
+
 #-----------------------------------------------------------------------
-load_session()
-hexchat.hook_timer(500000, save_session) # Save every x minutes
+# Load the previous session:
+# 1. Setup a hook for '376' RPL_ENDOFMOTD (RFC-1459). When we receive
+# this we know we are connected to the server and can connect to its
+# channels.
+# 2. Load the servers, every time you receive their 'motd' the
+# corresponding channels are loaded
+hexchat.hook_server('376', join_channels)
+
+tab_data = get_tab_data()
+for network in tab_data.keys():
+    connect_server(network)
+
+
+hexchat.hook_timer(10000, save_session) # Save every x minutes
 # hexchat.hook_unload(save_session) # Doesn't work with X11 Quit
